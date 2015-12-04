@@ -22,11 +22,11 @@ import           Language.Haskell.TH
 -- | Derive ToRTCM3 typeclass, given an RTCM3 message number name and the
 -- name of the implemented type.
 deriveRTCM3 :: Name -> Name -> Q [Dec]
-deriveRTCM3 number name =
+deriveRTCM3 num name =
   [d|instance ToRTCM3 $(conT name) where
        toRTCM3 msg = encoded & msgRTCM3Crc .~ checkCrc encoded where
          payload = runPut $ B.runBitPut $ do
-           B.putWord16be 10 $(varE number)
+           B.putWord16be 10 $(varE num)
            B.putByteString $ toStrict $ encode msg
          encoded = Msg (fromIntegral $ length payload) (toStrict payload) 0
     |]
