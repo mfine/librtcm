@@ -19,6 +19,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Data.CRC24Q
                      , Data.RTCM3
+                     , Data.RTCM3.Observations
                      , Data.RTCM3.Types
   other-modules:       Data.RTCM3.Extras
   ghc-options:         -Wall
@@ -40,6 +41,7 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Test.hs
+  other-modules:       Test.Data.CRC24Q
   build-depends:       base
                      , basic-prelude
                      , tasty

@@ -23,36 +23,38 @@ import           Data.CRC24Q
 import           Data.RTCM3.Extras
 import           Data.Word.Word24
 
-frameRTCM3Preamble :: Word8
-frameRTCM3Preamble = 0xD3
+msgRTCM3Preamble :: Word8
+msgRTCM3Preamble = 0xD3
 
-data Frame = Frame
-  { _frameRTCM3Len     :: Word16
-  , _frameRTCM3Payload :: !ByteString
-  , _frameRTCM3Crc     :: Word24
+data Msg = Msg
+  { _msgRTCM3Len     :: Word16
+  , _msgRTCM3Payload :: !ByteString
+  , _msgRTCM3Crc     :: Word24
   } deriving ( Show, Read, Eq )
 
-$(makeLenses ''Frame)
+$(makeLenses ''Msg)
 
-instance Binary Frame where
+instance Binary Msg where
   get = do
-    _frameRTCM3Len <- B.runBitGet $ do
+    _msgRTCM3Len <- B.runBitGet $ do
       void $ B.getWord16be 6
       B.getWord16be 10
-    _frameRTCM3Payload <- getByteString $ fromIntegral _frameRTCM3Len
-    _frameRTCM3Crc     <- getWord24be
-    return Frame {..}
+    _msgRTCM3Payload <- getByteString $ fromIntegral _msgRTCM3Len
+    _msgRTCM3Crc     <- getWord24be
+    return Msg {..}
 
-  put Frame {..} = do
+  put Msg {..} = do
     B.runBitPut $ do
       B.putWord16be 6 0
-      B.putWord16be 10 _frameRTCM3Len
-    putByteString _frameRTCM3Payload
-    putWord24be _frameRTCM3Crc
+      B.putWord16be 10 _msgRTCM3Len
+    putByteString _msgRTCM3Payload
+    putWord24be _msgRTCM3Crc
 
-checkCrc :: Frame -> Word24
-checkCrc Frame {..} =
+checkCrc :: Msg -> Word24
+checkCrc Msg {..} =
   crc24q $ toLazyByteString $
-    word16BE _frameRTCM3Len <>
-    byteString _frameRTCM3Payload
+    word16BE _msgRTCM3Len <>
+    byteString _msgRTCM3Payload
 
+class Binary a => ToRTCM a where
+  toRTCM :: a -> Msg
