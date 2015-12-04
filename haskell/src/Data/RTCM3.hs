@@ -6,8 +6,10 @@
 -- Stability:   experimental
 -- Portability: portable
 --
--- RTCM3 module.
+-- RTCMv3 message containers.
 
 module Data.RTCM3
-  (
+  ( module Data.RTCM3.Types
   ) where
+
+import Data.RTCM3.Types

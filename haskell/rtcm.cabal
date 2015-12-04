@@ -19,15 +19,22 @@ library
   hs-source-dirs:      src
   exposed-modules:     Data.CRC24Q
                      , Data.RTCM3
+                     , Data.RTCM3.Types
+  other-modules:       Data.RTCM3.Extras
   ghc-options:         -Wall
   build-depends:       array
                      , base >= 4.7 && < 5
                      , basic-prelude
+                     , binary
+                     , binary-bits
                      , bytestring
+                     , lens
                      , word24
   default-language:    Haskell2010
   default-extensions:  NoImplicitPrelude
                        OverloadedStrings
+                       RecordWildCards
+                       TemplateHaskell
 
 test-suite test
   type:                exitcode-stdio-1.0
