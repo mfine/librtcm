@@ -56,5 +56,5 @@ checkCrc Msg {..} =
     word16BE _msgRTCM3Len <>
     byteString _msgRTCM3Payload
 
-class Binary a => ToRTCM a where
-  toRTCM :: a -> Msg
+class Binary a => ToRTCM3 a where
+  toRTCM3 :: a -> Msg

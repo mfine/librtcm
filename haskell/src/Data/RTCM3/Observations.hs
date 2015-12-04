@@ -13,6 +13,10 @@ module Data.RTCM3.Observations where
 import BasicPrelude
 import Control.Lens
 import Data.Binary
+import Data.RTCM3.TH
+
+msg1001 :: Word16
+msg1001 = 1001
 
 data Msg1001 = Msg1001
   {
@@ -21,6 +25,8 @@ data Msg1001 = Msg1001
 $(makeLenses ''Msg1001)
 
 instance Binary Msg1001 where
-  get = undefined
+  get = return Msg1001
 
-  put = undefined
+  put _ = return ()
+
+$(deriveRTCM3 'msg1001 ''Msg1001)
