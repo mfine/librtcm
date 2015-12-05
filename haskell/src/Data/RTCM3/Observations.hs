@@ -224,7 +224,7 @@ $(makeLenses ''Msg1004)
 instance Binary Msg1004 where
   get = B.runBitGet $ do
     _msg1004_header <- getBits 0
-    _msg1004_observations <- replicateM (fromIntegral $ _msg1004_header ^. gpsObservationsHeader_num) $ getBits 0
+    _msg1004_observations <- replicateM (fromIntegral $ _msg1004_header ^. gpsObservationsHeader_n) $ getBits 0
     return Msg1004 {..}
 
   put Msg1004 {..} = B.runBitPut $ do
