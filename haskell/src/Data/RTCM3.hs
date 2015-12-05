@@ -54,10 +54,10 @@ instance Binary RTCM3Msg where
 
   put msg = do
     putWord8 msgRTCM3Preamble
-    put $ encode' msg where
-      encode' (RTCM3Msg1001 _msg rtcm3) = rtcm3
-      encode' (RTCM3Msg1002 _msg rtcm3) = rtcm3
-      encode' (RTCM3Msg1003 _msg rtcm3) = rtcm3
-      encode' (RTCM3Msg1004 _msg rtcm3) = rtcm3
-      encode' (RTCM3MsgUnknown _num rtcm3) = rtcm3
-      encode' (RTCM3MsgBadCrc _crc rtcm3) = rtcm3
+    encode' msg where
+      encode' (RTCM3Msg1001 _msg rtcm3) = put rtcm3 >> putWord24be (checkCrc rtcm3)
+      encode' (RTCM3Msg1002 _msg rtcm3) = put rtcm3 >> putWord24be (checkCrc rtcm3)
+      encode' (RTCM3Msg1003 _msg rtcm3) = put rtcm3 >> putWord24be (checkCrc rtcm3)
+      encode' (RTCM3Msg1004 _msg rtcm3) = put rtcm3 >> putWord24be (checkCrc rtcm3)
+      encode' (RTCM3MsgUnknown _num rtcm3) = put rtcm3 >> putWord24be (checkCrc rtcm3)
+      encode' (RTCM3MsgBadCrc crc rtcm3) = put rtcm3 >> putWord24be crc

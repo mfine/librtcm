@@ -46,7 +46,10 @@ instance Binary Msg where
     putByteString _msgRTCM3Payload
 
 checkCrc :: Msg -> Word24
-checkCrc = crc24q . encode
+checkCrc msg =
+  crc24q $ runPut $ do
+    putWord8 msgRTCM3Preamble
+    put msg
 
 class Binary a => ToRTCM3 a where
   toRTCM3 :: a -> Msg
