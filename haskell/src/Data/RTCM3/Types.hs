@@ -37,7 +37,7 @@ $(makeLenses ''Msg)
 instance Binary Msg where
   get = do
     _msgRTCM3Len <- B.runBitGet $ do
-      void $ B.getWord16be 6
+      _reserved <- B.getWord16be 6
       B.getWord16be 10
     _msgRTCM3Payload <- getByteString $ fromIntegral _msgRTCM3Len
     _msgRTCM3Crc     <- getWord24be
