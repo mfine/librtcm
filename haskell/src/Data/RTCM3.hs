@@ -19,6 +19,8 @@ import           Data.Binary
 import           Data.Binary.Get
 import qualified Data.Binary.Bits.Get as B
 import           Data.ByteString.Lazy
+import           Data.Word.Word24
+import           Data.RTCM3.Extras
 import           Data.RTCM3.Observations
 import           Data.RTCM3.Types
 
@@ -28,7 +30,7 @@ data RTCM3Msg =
    | RTCM3Msg1003 Msg1003 Msg
    | RTCM3Msg1004 Msg1004 Msg
    | RTCM3MsgUnknown Word16 Msg
-   | RTCM3MsgBadCrc Msg
+   | RTCM3MsgBadCrc Word24 Msg
    deriving ( Show, Read, Eq )
 
 instance Binary RTCM3Msg where
@@ -36,9 +38,10 @@ instance Binary RTCM3Msg where
     preamble <- getWord8
     if preamble /= msgRTCM3Preamble then get else do
       rtcm3 <- get
-      return $ decode' rtcm3 where
-        decode' rtcm3@Msg {..}
-          | checkCrc rtcm3 /= _msgRTCM3Crc = RTCM3MsgBadCrc rtcm3
+      crc <- getWord24be
+      return $ decode' rtcm3 crc where
+        decode' rtcm3@Msg {..} crc
+          | checkCrc rtcm3 /= crc = RTCM3MsgBadCrc crc rtcm3
           | otherwise = flip runGet (fromStrict _msgRTCM3Payload) $ B.runBitGet $ do
               num <- B.getWord16be 12
               return $ decode'' num where
@@ -57,4 +60,4 @@ instance Binary RTCM3Msg where
       encode' (RTCM3Msg1003 _msg rtcm3) = rtcm3
       encode' (RTCM3Msg1004 _msg rtcm3) = rtcm3
       encode' (RTCM3MsgUnknown _num rtcm3) = rtcm3
-      encode' (RTCM3MsgBadCrc rtcm3) = rtcm3
+      encode' (RTCM3MsgBadCrc _crc rtcm3) = rtcm3

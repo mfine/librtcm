@@ -11,7 +11,6 @@
 module Data.RTCM3.TH where
 
 import BasicPrelude hiding ( length )
-import Control.Lens
 import Data.Binary
 import Data.ByteString.Lazy
 import Data.RTCM3.Types
@@ -22,7 +21,6 @@ import Language.Haskell.TH
 deriveRTCM3 :: Name -> Q [Dec]
 deriveRTCM3 name =
   [d|instance ToRTCM3 $(conT name) where
-       toRTCM3 msg = encoded & msgRTCM3Crc .~ checkCrc encoded where
+       toRTCM3 msg = Msg (fromIntegral $ length payload) (toStrict payload) where
          payload = encode msg
-         encoded = Msg (fromIntegral $ length payload) (toStrict payload) 0
     |]
