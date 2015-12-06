@@ -21,60 +21,60 @@ import           Data.RTCM3.Extras
 import           Data.RTCM3.TH
 
 data GpsObservationHeader = GpsObservationHeader
-  { _gpsObservationsHeader_num                :: Word16
-  , _gpsObservationsHeader_station            :: Word16
-  , _gpsObservationsHeader_tow                :: Word32
-  , _gpsObservationsHeader_synchronous        :: Bool
-  , _gpsObservationsHeader_n                  :: Word8
-  , _gpsObservationsHeader_smoothingIndicator :: Bool
-  , _gpsObservationsHeader_smoothingInterval  :: Word8
+  { _gpsObservationHeader_num               :: Word16
+  , _gpsObservationHeader_station           :: Word16
+  , _gpsObservationHeader_tow               :: Word32
+  , _gpsObservationHeader_synchronous       :: Bool
+  , _gpsObservationHeader_n                 :: Word8
+  , _gpsObservationHeader_smoothing         :: Bool
+  , _gpsObservationHeader_smoothingInterval :: Word8
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsObservationHeader)
 
 instance BinaryBit GpsObservationHeader where
   getBits _n = do
-    _gpsObservationsHeader_num                <- B.getWord16be 12
-    _gpsObservationsHeader_station            <- B.getWord16be 12
-    _gpsObservationsHeader_tow                <- B.getWord32be 30
-    _gpsObservationsHeader_synchronous        <- B.getBool
-    _gpsObservationsHeader_n                  <- B.getWord8 5
-    _gpsObservationsHeader_smoothingIndicator <- B.getBool
-    _gpsObservationsHeader_smoothingInterval  <- B.getWord8 3
+    _gpsObservationHeader_num               <- B.getWord16be 12
+    _gpsObservationHeader_station           <- B.getWord16be 12
+    _gpsObservationHeader_tow               <- B.getWord32be 30
+    _gpsObservationHeader_synchronous       <- B.getBool
+    _gpsObservationHeader_n                 <- B.getWord8 5
+    _gpsObservationHeader_smoothing         <- B.getBool
+    _gpsObservationHeader_smoothingInterval <- B.getWord8 3
     return GpsObservationHeader {..}
 
   putBits _n GpsObservationHeader {..} = do
-    B.putWord16be 12 _gpsObservationsHeader_num
-    B.putWord16be 12 _gpsObservationsHeader_station
-    B.putWord32be 30 _gpsObservationsHeader_tow
-    B.putWord32be 30 _gpsObservationsHeader_tow
-    B.putBool        _gpsObservationsHeader_synchronous
-    B.putWord8 5     _gpsObservationsHeader_n
-    B.putBool        _gpsObservationsHeader_smoothingIndicator
-    B.putWord8 3     _gpsObservationsHeader_smoothingInterval
+    B.putWord16be 12 _gpsObservationHeader_num
+    B.putWord16be 12 _gpsObservationHeader_station
+    B.putWord32be 30 _gpsObservationHeader_tow
+    B.putWord32be 30 _gpsObservationHeader_tow
+    B.putBool        _gpsObservationHeader_synchronous
+    B.putWord8 5     _gpsObservationHeader_n
+    B.putBool        _gpsObservationHeader_smoothing
+    B.putWord8 3     _gpsObservationHeader_smoothingInterval
 
 data GpsL1Observation = GpsL1Observation
-  { _gpsL1Observation_codeIndicator     :: Bool
-  , _gpsL1Observation_pseudorange       :: Word32
-  , _gpsL1Observation_carrierMinusCode  :: Int32
-  , _gpsL1Observation_lockTimeIndicator :: Word8
+  { _gpsL1Observation_code             :: Bool
+  , _gpsL1Observation_pseudorange      :: Word32
+  , _gpsL1Observation_carrierMinusCode :: Int32
+  , _gpsL1Observation_lockTime         :: Word8
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsL1Observation)
 
 instance BinaryBit GpsL1Observation where
   getBits _n = do
-    _gpsL1Observation_codeIndicator     <- B.getBool
-    _gpsL1Observation_pseudorange       <- B.getWord32be 24
-    _gpsL1Observation_carrierMinusCode  <- getInt32be 20
-    _gpsL1Observation_lockTimeIndicator <- B.getWord8 7
+    _gpsL1Observation_code             <- B.getBool
+    _gpsL1Observation_pseudorange      <- B.getWord32be 24
+    _gpsL1Observation_carrierMinusCode <- getInt32be 20
+    _gpsL1Observation_lockTime         <- B.getWord8 7
     return GpsL1Observation {..}
 
   putBits _n GpsL1Observation {..} = do
-    B.putBool        _gpsL1Observation_codeIndicator
+    B.putBool        _gpsL1Observation_code
     B.putWord32be 24 _gpsL1Observation_pseudorange
 --  B.putInt32be 20  _gpsL1Observation_carrierMinusCode  TODO
-    B.putWord8 7     _gpsL1Observation_lockTimeIndicator
+    B.putWord8 7     _gpsL1Observation_lockTime
 
 data GpsL1ExtObservation = GpsL1ExtObservation
   { _gpsL1ExtObservation_ambiguity :: Word8
@@ -95,27 +95,27 @@ instance BinaryBit GpsL1ExtObservation where
 
 
 data GpsL2Observation = GpsL2Observation
-  { _gpsL2Observation_codeIndicator         :: Word8
+  { _gpsL2Observation_code                  :: Word8
   , _gpsL2Observation_pseudorangeDifference :: Int16
   , _gpsL2Observation_carrierMinusCode      :: Int32
-  , _gpsL2Observation_lockTimeIndicator     :: Word8
+  , _gpsL2Observation_lockTime              :: Word8
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsL2Observation)
 
 instance BinaryBit GpsL2Observation where
   getBits _n = do
-    _gpsL2Observation_codeIndicator         <- B.getWord8 2
+    _gpsL2Observation_code                  <- B.getWord8 2
     _gpsL2Observation_pseudorangeDifference <- getInt16be 14
     _gpsL2Observation_carrierMinusCode      <- getInt32be 20
-    _gpsL2Observation_lockTimeIndicator     <- B.getWord8 7
+    _gpsL2Observation_lockTime              <- B.getWord8 7
     return GpsL2Observation {..}
 
   putBits _n GpsL2Observation {..} = do
-    B.putWord8 2     _gpsL2Observation_codeIndicator
---  B.putInt16be 14  _gpsL2Observation_pseudorangeDifference  TODO
---  B.putInt32be 20  _gpsL2Observation_carrierMinusCode       TODO
-    B.putWord8 7     _gpsL2Observation_lockTimeIndicator
+    B.putWord8 2    _gpsL2Observation_code
+--  B.putInt16be 14 _gpsL2Observation_pseudorangeDifference  TODO
+--  B.putInt32be 20 _gpsL2Observation_carrierMinusCode       TODO
+    B.putWord8 7    _gpsL2Observation_lockTime
 
 data GpsL2ExtObservation = GpsL2ExtObservation
   { _gpsL2ExtObservation_cnr :: Word8
@@ -160,8 +160,8 @@ $(makeLenses ''Msg1001)
 
 instance Binary Msg1001 where
   get = B.runBitGet $ do
-    _msg1001_header <- getBits 0
-    _msg1001_observations <- replicateM (fromIntegral $ _msg1001_header ^. gpsObservationsHeader_n) $ getBits 0
+    _msg1001_header       <- getBits 0
+    _msg1001_observations <- replicateM (fromIntegral $ _msg1001_header ^. gpsObservationHeader_n) $ getBits 0
     return Msg1001 {..}
 
   put Msg1001 {..} = B.runBitPut $ do
@@ -202,8 +202,8 @@ $(makeLenses ''Msg1002)
 
 instance Binary Msg1002 where
   get = B.runBitGet $ do
-    _msg1002_header <- getBits 0
-    _msg1002_observations <- replicateM (fromIntegral $ _msg1002_header ^. gpsObservationsHeader_n) $ getBits 0
+    _msg1002_header       <- getBits 0
+    _msg1002_observations <- replicateM (fromIntegral $ _msg1002_header ^. gpsObservationHeader_n) $ getBits 0
     return Msg1002 {..}
 
   put Msg1002 {..} = B.runBitPut $ do
@@ -247,8 +247,8 @@ $(makeLenses ''Msg1003)
 
 instance Binary Msg1003 where
   get = B.runBitGet $ do
-    _msg1003_header <- getBits 0
-    _msg1003_observations <- replicateM (fromIntegral $ _msg1003_header ^. gpsObservationsHeader_n) $ getBits 0
+    _msg1003_header       <- getBits 0
+    _msg1003_observations <- replicateM (fromIntegral $ _msg1003_header ^. gpsObservationHeader_n) $ getBits 0
     return Msg1003 {..}
 
   put Msg1003 {..} = B.runBitPut $ do
@@ -295,8 +295,8 @@ $(makeLenses ''Msg1004)
 
 instance Binary Msg1004 where
   get = B.runBitGet $ do
-    _msg1004_header <- getBits 0
-    _msg1004_observations <- replicateM (fromIntegral $ _msg1004_header ^. gpsObservationsHeader_n) $ getBits 0
+    _msg1004_header       <- getBits 0
+    _msg1004_observations <- replicateM (fromIntegral $ _msg1004_header ^. gpsObservationHeader_n) $ getBits 0
     return Msg1004 {..}
 
   put Msg1004 {..} = B.runBitPut $ do

@@ -19,7 +19,9 @@ library
   hs-source-dirs:      src
   exposed-modules:     Data.CRC24Q
                      , Data.RTCM3
+                     , Data.RTCM3.Antennas
                      , Data.RTCM3.Observations
+                     , Data.RTCM3.Stations
                      , Data.RTCM3.Types
   other-modules:       Data.RTCM3.Extras
                      , Data.RTCM3.TH
