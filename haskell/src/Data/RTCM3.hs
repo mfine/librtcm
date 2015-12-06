@@ -33,6 +33,8 @@ data RTCM3Msg =
    | RTCM3Msg1004 Msg1004 Msg
    | RTCM3Msg1005 Msg1005 Msg
    | RTCM3Msg1006 Msg1006 Msg
+   | RTCM3Msg1007 Msg1007 Msg
+   | RTCM3Msg1008 Msg1008 Msg
    | RTCM3MsgUnknown Word16 Msg
    | RTCM3MsgBadCrc Word24 Msg
    deriving ( Show, Read, Eq )
@@ -56,6 +58,8 @@ instance Binary RTCM3Msg where
                   | num == msg1004 = RTCM3Msg1004 (decode $ fromStrict _msgRTCM3Payload) rtcm3
                   | num == msg1005 = RTCM3Msg1005 (decode $ fromStrict _msgRTCM3Payload) rtcm3
                   | num == msg1006 = RTCM3Msg1006 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+                  | num == msg1007 = RTCM3Msg1007 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+                  | num == msg1008 = RTCM3Msg1008 (decode $ fromStrict _msgRTCM3Payload) rtcm3
                   | otherwise = RTCM3MsgUnknown num rtcm3
 
   put msg = do
@@ -67,5 +71,7 @@ instance Binary RTCM3Msg where
       encode' (RTCM3Msg1004 _msg rtcm3) = put rtcm3 >> putWord24be (checkCrc rtcm3)
       encode' (RTCM3Msg1005 _msg rtcm3) = put rtcm3 >> putWord24be (checkCrc rtcm3)
       encode' (RTCM3Msg1006 _msg rtcm3) = put rtcm3 >> putWord24be (checkCrc rtcm3)
+      encode' (RTCM3Msg1007 _msg rtcm3) = put rtcm3 >> putWord24be (checkCrc rtcm3)
+      encode' (RTCM3Msg1008 _msg rtcm3) = put rtcm3 >> putWord24be (checkCrc rtcm3)
       encode' (RTCM3MsgUnknown _num rtcm3) = put rtcm3 >> putWord24be (checkCrc rtcm3)
       encode' (RTCM3MsgBadCrc crc rtcm3) = put rtcm3 >> putWord24be crc

@@ -16,7 +16,6 @@ import           Data.Binary
 import           Data.Binary.Bits
 import qualified Data.Binary.Bits.Get as B
 import qualified Data.Binary.Bits.Put as B
-import           Data.Int
 import           Data.RTCM3.Extras
 import           Data.RTCM3.TH
 
@@ -39,30 +38,32 @@ instance BinaryBit AntennaReference where
   getBits _n = do
     _antennaReference_num        <- B.getWord16be 12
     _antennaReference_station    <- B.getWord16be 12
+    _reserved                    <- B.getWord8 6
     _antennaReference_gps        <- B.getBool
     _antennaReference_glonass    <- B.getBool
     _antennaReference_galileo    <- B.getBool
     _antennaReference_computed   <- B.getBool
---  _antennaReference_ecef_x     <- B.getInt64be 38   TODO
+    _antennaReference_ecef_x     <- getInt64be 38
     _antennaReference_oscillator <- B.getBool
     _reserved                    <- B.getBool
---  _antennaReference_ecef_y     <- B.getInt64be 38   TODO
+    _antennaReference_ecef_y     <- getInt64be 38
     _reserved                    <- B.getWord8 2
---  _antennaReference_ecef_z     <- B.getInt64be 38   TODO
+    _antennaReference_ecef_z     <- getInt64be 38
     return AntennaReference {..}
 
   putBits _n AntennaReference {..} = do
     B.putWord16be 12 _antennaReference_num
     B.putWord16be 12 _antennaReference_station
+    B.putWord8 6     0
     B.putBool        _antennaReference_gps
     B.putBool        _antennaReference_glonass
     B.putBool        _antennaReference_galileo
     B.putBool        _antennaReference_computed
---  B.putInt64be 38  _antennaReference_ecef_x       TODO
+    putInt64be 38    _antennaReference_ecef_x
     B.putBool        False
---  B.putInt64be 38  _antennaReference_ecef_y       TODO
+    putInt64be 38    _antennaReference_ecef_y
     B.putWord8 2     0
---  B.putInt64be 38  _antennaReference_ecef_z       TODO
+    putInt64be 38    _antennaReference_ecef_z
 
 data ExtAntennaReference = ExtAntennaReference
   { _extAntennaReference_height :: Word16
@@ -75,7 +76,7 @@ instance BinaryBit ExtAntennaReference where
     _extAntennaReference_height <- B.getWord16be 16
     return ExtAntennaReference {..}
 
-  putBits _n ExtAntennaReference {..} = do
+  putBits _n ExtAntennaReference {..} =
     B.putWord16be 16 _extAntennaReference_height
 
 data AntennaDescriptor = AntennaDescriptor
@@ -93,7 +94,7 @@ instance BinaryBit AntennaDescriptor where
     _antennaDescriptor_num         <- B.getWord16be 12
     _antennaDescriptor_station     <- B.getWord16be 12
     _antennaDescriptor_n           <- B.getWord8 8
-    _antennaDescriptor_descriptors <- replicateM (fromIntegral $ _antennaDescriptor_n) $ B.getWord8 8
+    _antennaDescriptor_descriptors <- replicateM (fromIntegral _antennaDescriptor_n) $ B.getWord8 8
     _antennaDescriptor_setup       <- B.getWord8 8
     return AntennaDescriptor {..}
 
@@ -113,8 +114,8 @@ $(makeLenses ''ExtAntennaDescriptor)
 
 instance BinaryBit ExtAntennaDescriptor where
   getBits _n = do
-    _extAntennaDescriptor_n <- B.getWord8 8
-    _extAntennaDescriptor_serialNmbers <- replicateM (fromIntegral $ _extAntennaDescriptor_n) $ B.getWord8 8
+    _extAntennaDescriptor_n             <- B.getWord8 8
+    _extAntennaDescriptor_serialNumbers <- replicateM (fromIntegral _extAntennaDescriptor_n) $ B.getWord8 8
     return ExtAntennaDescriptor {..}
 
   putBits _n ExtAntennaDescriptor {..} = do
@@ -135,7 +136,7 @@ instance Binary Msg1005 where
     _msg1005_reference <- getBits 0
     return Msg1005 {..}
 
-  put Msg1005 {..} = B.runBitPut $ do
+  put Msg1005 {..} = B.runBitPut $
     putBits 0 _msg1005_reference
 
 $(deriveRTCM3 ''Msg1005)
@@ -176,7 +177,7 @@ instance Binary Msg1007 where
     _msg1007_descriptor <- getBits 0
     return Msg1007 {..}
 
-  put Msg1007 {..} = B.runBitPut $ do
+  put Msg1007 {..} = B.runBitPut $
     putBits 0 _msg1007_descriptor
 
 $(deriveRTCM3 ''Msg1007)

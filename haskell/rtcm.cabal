@@ -20,6 +20,7 @@ library
   exposed-modules:     Data.CRC24Q
                      , Data.RTCM3
                      , Data.RTCM3.Antennas
+                     , Data.RTCM3.Internal
                      , Data.RTCM3.Observations
                      , Data.RTCM3.Types
   other-modules:       Data.RTCM3.Extras
@@ -45,6 +46,7 @@ test-suite test
   hs-source-dirs:      test
   main-is:             Test.hs
   other-modules:       Test.Data.CRC24Q
+                     , Test.Data.RTCM3.Extras
   build-depends:       base
                      , basic-prelude
                      , tasty

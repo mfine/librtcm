@@ -73,7 +73,7 @@ instance BinaryBit GpsL1Observation where
   putBits _n GpsL1Observation {..} = do
     B.putBool        _gpsL1Observation_code
     B.putWord32be 24 _gpsL1Observation_pseudorange
---  B.putInt32be 20  _gpsL1Observation_carrierMinusCode  TODO
+    putInt32be 20    _gpsL1Observation_carrierMinusCode
     B.putWord8 7     _gpsL1Observation_lockTime
 
 data GpsL1ExtObservation = GpsL1ExtObservation
@@ -113,8 +113,8 @@ instance BinaryBit GpsL2Observation where
 
   putBits _n GpsL2Observation {..} = do
     B.putWord8 2    _gpsL2Observation_code
---  B.putInt16be 14 _gpsL2Observation_pseudorangeDifference  TODO
---  B.putInt32be 20 _gpsL2Observation_carrierMinusCode       TODO
+    putInt16be 14   _gpsL2Observation_pseudorangeDifference
+    putInt32be 20   _gpsL2Observation_carrierMinusCode
     B.putWord8 7    _gpsL2Observation_lockTime
 
 data GpsL2ExtObservation = GpsL2ExtObservation
@@ -128,7 +128,7 @@ instance BinaryBit GpsL2ExtObservation where
     _gpsL2ExtObservation_cnr <- B.getWord8 8
     return GpsL2ExtObservation {..}
 
-  putBits _n GpsL2ExtObservation {..} = do
+  putBits _n GpsL2ExtObservation {..} =
     B.putWord8 8 _gpsL2ExtObservation_cnr
 
 msg1001 :: Word16
