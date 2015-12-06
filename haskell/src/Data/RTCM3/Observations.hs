@@ -134,8 +134,26 @@ instance BinaryBit GpsL2ExtObservation where
 msg1001 :: Word16
 msg1001 = 1001
 
+data Observation1001 = Observation1001
+  { _observation1001_sat :: Word8
+  , _observation1001_l1  :: GpsL1Observation
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Observation1001)
+
+instance BinaryBit Observation1001 where
+  getBits n = do
+    _observation1001_sat <- B.getWord8 6
+    _observation1001_l1  <- getBits n
+    return Observation1001 {..}
+
+  putBits n Observation1001 {..} = do
+    B.putWord8 6 _observation1001_sat
+    putBits n _observation1001_l1
+
 data Msg1001 = Msg1001
-  { _msg1001_header :: GpsObservationHeader
+  { _msg1001_header       :: GpsObservationHeader
+  , _msg1001_observations :: [Observation1001]
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1001)
@@ -143,17 +161,41 @@ $(makeLenses ''Msg1001)
 instance Binary Msg1001 where
   get = B.runBitGet $ do
     _msg1001_header <- getBits 0
+    _msg1001_observations <- replicateM (fromIntegral $ _msg1001_header ^. gpsObservationsHeader_n) $ getBits 0
     return Msg1001 {..}
 
-  put _ = return ()
+  put Msg1001 {..} = B.runBitPut $ do
+    putBits 0 _msg1001_header
+    forM_ _msg1001_observations $ putBits 0
 
 $(deriveRTCM3 ''Msg1001)
 
 msg1002 :: Word16
 msg1002 = 1002
 
+data Observation1002 = Observation1002
+  { _observation1002_sat :: Word8
+  , _observation1002_l1  :: GpsL1Observation
+  , _observation1002_l1e :: GpsL1ExtObservation
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Observation1002)
+
+instance BinaryBit Observation1002 where
+  getBits n = do
+    _observation1002_sat <- B.getWord8 6
+    _observation1002_l1  <- getBits n
+    _observation1002_l1e <- getBits n
+    return Observation1002 {..}
+
+  putBits n Observation1002 {..} = do
+    B.putWord8 6 _observation1002_sat
+    putBits n _observation1002_l1
+    putBits n _observation1002_l1e
+
 data Msg1002 = Msg1002
-  { _msg1002_header :: GpsObservationHeader
+  { _msg1002_header       :: GpsObservationHeader
+  , _msg1002_observations :: [Observation1002]
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1002)
@@ -161,17 +203,44 @@ $(makeLenses ''Msg1002)
 instance Binary Msg1002 where
   get = B.runBitGet $ do
     _msg1002_header <- getBits 0
+    _msg1002_observations <- replicateM (fromIntegral $ _msg1002_header ^. gpsObservationsHeader_n) $ getBits 0
     return Msg1002 {..}
 
-  put _ = return ()
+  put Msg1002 {..} = B.runBitPut $ do
+    putBits 0 _msg1002_header
+    forM_ _msg1002_observations $ putBits 0
 
 $(deriveRTCM3 ''Msg1002)
 
 msg1003 :: Word16
 msg1003 = 1003
 
+data Observation1003 = Observation1003
+  { _observation1003_sat :: Word8
+  , _observation1003_l1  :: GpsL1Observation
+  , _observation1003_l1e :: GpsL1ExtObservation
+  , _observation1003_l2  :: GpsL2Observation
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Observation1003)
+
+instance BinaryBit Observation1003 where
+  getBits n = do
+    _observation1003_sat <- B.getWord8 6
+    _observation1003_l1  <- getBits n
+    _observation1003_l1e <- getBits n
+    _observation1003_l2  <- getBits n
+    return Observation1003 {..}
+
+  putBits n Observation1003 {..} = do
+    B.putWord8 6 _observation1003_sat
+    putBits n _observation1003_l1
+    putBits n _observation1003_l1e
+    putBits n _observation1003_l2
+
 data Msg1003 = Msg1003
-  { _msg1003_header :: GpsObservationHeader
+  { _msg1003_header       :: GpsObservationHeader
+  , _msg1003_observations :: [Observation1003]
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1003)
@@ -179,9 +248,12 @@ $(makeLenses ''Msg1003)
 instance Binary Msg1003 where
   get = B.runBitGet $ do
     _msg1003_header <- getBits 0
+    _msg1003_observations <- replicateM (fromIntegral $ _msg1003_header ^. gpsObservationsHeader_n) $ getBits 0
     return Msg1003 {..}
 
-  put _ = return ()
+  put Msg1003 {..} = B.runBitPut $ do
+    putBits 0 _msg1003_header
+    forM_ _msg1003_observations $ putBits 0
 
 $(deriveRTCM3 ''Msg1003)
 
@@ -229,5 +301,6 @@ instance Binary Msg1004 where
 
   put Msg1004 {..} = B.runBitPut $ do
     putBits 0 _msg1004_header
+    forM_ _msg1004_observations $ putBits 0
 
 $(deriveRTCM3 ''Msg1004)
