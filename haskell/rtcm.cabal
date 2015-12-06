@@ -1,6 +1,6 @@
 name:                  rtcm
-version:               0.1.0
-synopsis:              Haskell bindings for RTCM.
+version:               0.1.1
+synopsis:              RTCM Library.
 description:           Haskell bindings for RTCM.
 homepage:              http://github.com/swift-nav/librtcm
 license:               BSD3
@@ -10,6 +10,11 @@ copyright:             Copyright (C) 2015 Swift Navigation, Inc.
 category:              Network
 build-type:            Simple
 cabal-version:         >= 1.10
+description:
+  Haskell bindings for Radio Technical Commission For Maritime
+  Services (RTCM) standard, supporting GPS, GLONASS, Galileo and other
+  satellite-based position systems operation with one reference
+  station or a network.
 
 source-repository head
   type:                git
