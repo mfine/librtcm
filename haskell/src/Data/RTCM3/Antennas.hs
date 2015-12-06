@@ -78,6 +78,49 @@ instance BinaryBit ExtAntennaReference where
   putBits _n ExtAntennaReference {..} = do
     B.putWord16be 16 _extAntennaReference_height
 
+data AntennaDescriptor = AntennaDescriptor
+  { _antennaDescriptor_num         :: Word16
+  , _antennaDescriptor_station     :: Word16
+  , _antennaDescriptor_n           :: Word8
+  , _antennaDescriptor_descriptors :: [Word8]
+  , _antennaDescriptor_setup       :: Word8
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''AntennaDescriptor)
+
+instance BinaryBit AntennaDescriptor where
+  getBits _n = do
+    _antennaDescriptor_num         <- B.getWord16be 12
+    _antennaDescriptor_station     <- B.getWord16be 12
+    _antennaDescriptor_n           <- B.getWord8 8
+    _antennaDescriptor_descriptors <- replicateM (fromIntegral $ _antennaDescriptor_n) $ B.getWord8 8
+    _antennaDescriptor_setup       <- B.getWord8 8
+    return AntennaDescriptor {..}
+
+  putBits _n AntennaDescriptor {..} = do
+    B.putWord16be 12 _antennaDescriptor_num
+    B.putWord16be 12 _antennaDescriptor_station
+    B.putWord8 8     _antennaDescriptor_n
+    forM_ _antennaDescriptor_descriptors $ B.putWord8 8
+    B.putWord8 8 _antennaDescriptor_setup
+
+data ExtAntennaDescriptor = ExtAntennaDescriptor
+  { _extAntennaDescriptor_n             :: Word8
+  , _extAntennaDescriptor_serialNumbers :: [Word8]
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''ExtAntennaDescriptor)
+
+instance BinaryBit ExtAntennaDescriptor where
+  getBits _n = do
+    _extAntennaDescriptor_n <- B.getWord8 8
+    _extAntennaDescriptor_serialNmbers <- replicateM (fromIntegral $ _extAntennaDescriptor_n) $ B.getWord8 8
+    return ExtAntennaDescriptor {..}
+
+  putBits _n ExtAntennaDescriptor {..} = do
+    B.putWord8 8 _extAntennaDescriptor_n
+    forM_ _extAntennaDescriptor_serialNumbers $ B.putWord8 8
+
 msg1005 :: Word16
 msg1005 = 1005
 
@@ -119,4 +162,44 @@ instance Binary Msg1006 where
 
 $(deriveRTCM3 ''Msg1006)
 
+msg1007 :: Word16
+msg1007 = 1007
+
+data Msg1007 = Msg1007
+  { _msg1007_descriptor :: AntennaDescriptor
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msg1007)
+
+instance Binary Msg1007 where
+  get = B.runBitGet $ do
+    _msg1007_descriptor <- getBits 0
+    return Msg1007 {..}
+
+  put Msg1007 {..} = B.runBitPut $ do
+    putBits 0 _msg1007_descriptor
+
+$(deriveRTCM3 ''Msg1007)
+
+msg1008 :: Word16
+msg1008 = 1008
+
+data Msg1008 = Msg1008
+  { _msg1008_descriptor    :: AntennaDescriptor
+  , _msg1008_extDescriptor :: ExtAntennaDescriptor
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msg1008)
+
+instance Binary Msg1008 where
+  get = B.runBitGet $ do
+    _msg1008_descriptor    <- getBits 0
+    _msg1008_extDescriptor <- getBits 0
+    return Msg1008 {..}
+
+  put Msg1008 {..} = B.runBitPut $ do
+    putBits 0 _msg1008_descriptor
+    putBits 0 _msg1008_extDescriptor
+
+$(deriveRTCM3 ''Msg1008)
 
