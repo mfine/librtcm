@@ -11,6 +11,7 @@
 module Data.RTCM3
   ( RTCM3Msg (..)
   , module Data.RTCM3.Types
+  , module Data.RTCM3.Antennas
   , module Data.RTCM3.Observations
   ) where
 
@@ -20,6 +21,7 @@ import           Data.Binary.Get
 import qualified Data.Binary.Bits.Get as B
 import           Data.ByteString.Lazy
 import           Data.Word.Word24
+import           Data.RTCM3.Antennas
 import           Data.RTCM3.Extras
 import           Data.RTCM3.Observations
 import           Data.RTCM3.Types
