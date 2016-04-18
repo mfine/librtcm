@@ -25,5 +25,5 @@ deriveRTCM3 name =
        toRTCM3 msg = Msg len payload crc where
          payload = toStrict $ encode msg
          len     = fromIntegral $ length payload
-         crc     = checkCrc len payload
+         crc     = msgCrc len payload
     |]

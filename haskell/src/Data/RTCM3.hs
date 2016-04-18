@@ -55,24 +55,23 @@ instance Binary RTCM3Msg where
       rtcm3 <- get
       return $ decode' rtcm3  where
         decode' rtcm3@Msg {..}
-          | checkCrc _msgRTCM3Len _msgRTCM3Payload /= _msgRTCM3Crc = RTCM3MsgBadCrc rtcm3
-          | num == msg1001 = RTCM3Msg1001 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1002 = RTCM3Msg1002 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1003 = RTCM3Msg1003 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1004 = RTCM3Msg1004 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1005 = RTCM3Msg1005 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1006 = RTCM3Msg1006 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1007 = RTCM3Msg1007 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1008 = RTCM3Msg1008 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1009 = RTCM3Msg1009 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1010 = RTCM3Msg1010 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1011 = RTCM3Msg1011 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1012 = RTCM3Msg1012 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1013 = RTCM3Msg1013 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1033 = RTCM3Msg1033 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | num == msg1230 = RTCM3Msg1230 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-          | otherwise = RTCM3MsgUnknown num rtcm3 where
-            num = checkNum _msgRTCM3Payload
+          | msgCrc _msgRTCM3Len _msgRTCM3Payload /= _msgRTCM3Crc = RTCM3MsgBadCrc rtcm3
+          | msgNum _msgRTCM3Payload == msg1001 = RTCM3Msg1001 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1002 = RTCM3Msg1002 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1003 = RTCM3Msg1003 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1004 = RTCM3Msg1004 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1005 = RTCM3Msg1005 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1006 = RTCM3Msg1006 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1007 = RTCM3Msg1007 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1008 = RTCM3Msg1008 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1009 = RTCM3Msg1009 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1010 = RTCM3Msg1010 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1011 = RTCM3Msg1011 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1012 = RTCM3Msg1012 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1013 = RTCM3Msg1013 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1033 = RTCM3Msg1033 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | msgNum _msgRTCM3Payload == msg1230 = RTCM3Msg1230 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | otherwise = RTCM3MsgUnknown (msgNum _msgRTCM3Payload) rtcm3
 
   put msg = do
     putWord8 msgRTCM3Preamble

@@ -46,13 +46,13 @@ instance Binary Msg where
     putByteString _msgRTCM3Payload
     putWord24be _msgRTCM3Crc
 
-checkNum :: ByteString -> Word16
-checkNum payload =
+msgNum :: ByteString -> Word16
+msgNum payload =
   flip runGet (fromStrict payload) $ B.runBitGet $
     B.getWord16be 12
 
-checkCrc :: Word16 -> ByteString -> Word24
-checkCrc len payload =
+msgCrc :: Word16 -> ByteString -> Word24
+msgCrc len payload =
   crc24q $ toLazyByteString $
     word8 msgRTCM3Preamble  <>
     word16BE len            <>
