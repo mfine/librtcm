@@ -44,6 +44,7 @@ library
                      , binary-bits
                      , bytestring
                      , lens
+                     , lens-aeson
                      , template-haskell
                      , text
                      , word24

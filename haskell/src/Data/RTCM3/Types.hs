@@ -1,3 +1,4 @@
+{-# OPTIONS -fno-warn-orphans  #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
@@ -17,29 +18,39 @@
 module Data.RTCM3.Types where
 
 import           BasicPrelude
-import           Control.Lens            hiding ((.=))
+import           Control.Lens             hiding ((.=))
 import           Data.Aeson
 import           Data.Binary
-import qualified Data.Binary.Bits.Get    as B
+import qualified Data.Binary.Bits.Get     as B
 import           Data.Binary.Get
 import           Data.Binary.Put
+import           Data.ByteString.Base64   as Base64
 import           Data.ByteString.Builder
-import           Data.ByteString.Lazy    hiding (ByteString)
+import           Data.ByteString.Lazy     hiding (ByteString)
 import           Data.CRC24Q
-import           Data.RTCM3.Aeson        ()
+import           Data.RTCM3.Aeson         ()
 import           Data.RTCM3.Extras
+import           Data.Text.Encoding
+import           Data.Text.Encoding.Error
 import           Data.Word.Word24
 
 msgRTCM3Preamble :: Word8
 msgRTCM3Preamble = 0xD3
 
+newtype Bytes = Bytes
+  { unBytes :: ByteString
+  } deriving ( Show, Read, Eq )
+
 data Msg = Msg
-  { _msgRTCM3Len     :: Word16
-  , _msgRTCM3Payload :: !ByteString
-  , _msgRTCM3Crc     :: Word24
+  { _msgRTCM3Len     :: !Word16
+  , _msgRTCM3Payload :: !Bytes
+  , _msgRTCM3Crc     :: !Word24
   } deriving ( Show, Read, Eq )
 
 $(makeClassy ''Msg)
+
+instance ToJSON Bytes where
+  toJSON = toJSON . decodeUtf8With ignore . Base64.encode . unBytes
 
 instance ToJSON Msg where
   toJSON Msg {..} = object
@@ -51,14 +62,14 @@ instance ToJSON Msg where
 instance Binary Msg where
   get = do
     _msgRTCM3Len     <- getWord16be
-    _msgRTCM3Payload <- getByteString $ fromIntegral _msgRTCM3Len
+    _msgRTCM3Payload <- fmap Bytes $ getByteString $ fromIntegral _msgRTCM3Len
     _msgRTCM3Crc     <- getWord24be
     return Msg {..}
 
   put Msg {..} = do
-    putWord16be   _msgRTCM3Len
-    putByteString _msgRTCM3Payload
-    putWord24be   _msgRTCM3Crc
+    putWord16be _msgRTCM3Len
+    putByteString $ unBytes _msgRTCM3Payload
+    putWord24be _msgRTCM3Crc
 
 checkCrc :: Word16 -> ByteString -> Word24
 checkCrc len payload =
@@ -73,7 +84,7 @@ checkNum payload =
     B.getWord16be 12
 
 msgRTCM3Num :: HasMsg m => m -> Word16
-msgRTCM3Num = checkNum . (^. msgRTCM3Payload)
+msgRTCM3Num = checkNum . unBytes . (^. msgRTCM3Payload)
 
 class Binary a => ToRTCM3 a where
   toRTCM3 :: a -> Msg
