@@ -9,15 +9,12 @@
 -- Stability:   experimental
 -- Portability: portable
 --
--- RTCM3 to JSON tool - reads RTCM3 binary from stdin and sends RTCM3 JSON
+-- JSON to RTCM3 tool - reads RTCM3 JSON from stdin and sends RTCM3 binary
 -- to stdout.
 
-import BasicPrelude                      hiding (map)
+import BasicPrelude                      hiding (lines, mapMaybe)
 import Control.Monad.Trans.Resource
 import Data.Aeson
-import Data.Aeson.Encode
-import Data.ByteString.Builder
-import Data.ByteString.Lazy              hiding (ByteString, map)
 import Data.Conduit
 import Data.Conduit.Binary
 import Data.Conduit.List
@@ -25,14 +22,15 @@ import Data.Conduit.Serialization.Binary
 import Data.RTCM3
 import System.IO
 
--- | Encode a RTCM3Msg to a line of JSON.
-encodeLine :: RTCM3Msg -> ByteString
-encodeLine v = toStrict $ toLazyByteString $ encodeToBuilder (toJSON v) <> "\n"
+-- | Decode a line of JSON to RTCM3.
+decodeLine :: ByteString -> Maybe RTCM3Msg
+decodeLine = decodeStrict
 
 main :: IO ()
 main =
   runResourceT $
-    sourceHandle stdin  =$=
-      conduitDecode     =$=
-      map encodeLine $$
+    sourceHandle stdin    =$=
+      lines               =$=
+      mapMaybe decodeLine =$=
+      conduitEncode       $$
       sinkHandle stdout

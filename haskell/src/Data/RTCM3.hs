@@ -153,9 +153,9 @@ instance HasMsg RTCM3Msg where
 
 (<<>>) :: Value -> Value -> Value
 (<<>>) a b = fromMaybe Null $ do
-  a' <- preview _Object a
-  b' <- preview _Object b
-  return $ review _Object $ a' <> b'
+  c <- preview _Object a
+  d <- preview _Object b
+  return $ review _Object $ c <> d
 
 instance ToJSON RTCM3Msg where
   toJSON (RTCM3Msg1001    n m) = toJSON n <<>> toJSON m
@@ -182,3 +182,32 @@ instance ToJSON RTCM3Msg where
   toJSON (RTCM3MsgUnknown n m) = object [ "num" .= n ] <<>> toJSON m
   toJSON (RTCM3MsgBadCrc    m) = toJSON m
   toJSON (RTCM3MsgEmpty     m) = toJSON m
+
+instance FromJSON RTCM3Msg where
+  parseJSON obj@(Object o) = do
+    payload <- o .: "payload"
+    decoder (checkNum $ unBytes payload) payload where
+      decoder num payload
+        | num == msg1001 = RTCM3Msg1001 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1002 = RTCM3Msg1002 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1003 = RTCM3Msg1003 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1004 = RTCM3Msg1004 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1005 = RTCM3Msg1005 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1006 = RTCM3Msg1006 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1007 = RTCM3Msg1007 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1008 = RTCM3Msg1008 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1009 = RTCM3Msg1009 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1010 = RTCM3Msg1010 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1011 = RTCM3Msg1011 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1012 = RTCM3Msg1012 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1013 = RTCM3Msg1013 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1019 = RTCM3Msg1019 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1020 = RTCM3Msg1020 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1033 = RTCM3Msg1033 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1057 = RTCM3Msg1057 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1058 = RTCM3Msg1058 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1063 = RTCM3Msg1063 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1064 = RTCM3Msg1064 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1230 = RTCM3Msg1230 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | otherwise = RTCM3MsgUnknown <$> pure num <*> parseJSON obj
+  parseJSON _ = mzero

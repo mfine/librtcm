@@ -28,7 +28,6 @@ import           Data.ByteString.Base64   as Base64
 import           Data.ByteString.Builder
 import           Data.ByteString.Lazy     hiding (ByteString)
 import           Data.CRC24Q
-import           Data.RTCM3.Aeson         ()
 import           Data.RTCM3.Extras
 import           Data.Text.Encoding
 import           Data.Text.Encoding.Error
@@ -52,12 +51,28 @@ $(makeClassy ''Msg)
 instance ToJSON Bytes where
   toJSON = toJSON . decodeUtf8With ignore . Base64.encode . unBytes
 
+instance ToJSON Word24 where
+  toJSON = Number . fromIntegral
+
 instance ToJSON Msg where
   toJSON Msg {..} = object
     [ "len"     .= _msgRTCM3Len
     , "payload" .= _msgRTCM3Payload
     , "crc"     .= _msgRTCM3Crc
     ]
+
+instance FromJSON Bytes where
+  parseJSON = withText "ByteString" (pure . Bytes . Base64.decodeLenient . encodeUtf8)
+
+instance FromJSON Word24 where
+  parseJSON = withScientific "Word24" (pure . truncate)
+
+instance FromJSON Msg where
+  parseJSON (Object v) =
+    Msg <$> v .: "len"
+        <*> v .: "payload"
+        <*> v .: "crc"
+  parseJSON _ = mzero
 
 instance Binary Msg where
   get = do
